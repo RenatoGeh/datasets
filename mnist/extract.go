@@ -9,11 +9,33 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s n [test|train]\n"+
+		fmt.Printf("Usage: %s n [test|train] bits debug\n"+
 			"n     - number of digits to convert\n"+
 			"test  - use test set\n"+
-			"train - use training set\n", os.Args[0])
+			"train - use training set\n"+
+			"bits  - downscale resolution to bits number of bits\n"+
+			"debug - whether to sample digits (saves to /tmp/); 1 yes, 0 no\n", os.Args[0])
 		os.Exit(1)
+	}
+	max := 256
+	debug := false
+	if len(os.Args) >= 4 {
+		b, e := strconv.ParseUint(os.Args[3], 10, 8)
+		if e != nil {
+			fmt.Println(e)
+			panic(e)
+		}
+		max = 1 << b
+	}
+	if len(os.Args) >= 5 {
+		b, e := strconv.ParseUint(os.Args[4], 2, 1)
+		if e != nil {
+			fmt.Println(e)
+			panic(e)
+		}
+		if b == 1 {
+			debug = true
+		}
 	}
 	n, e := strconv.Atoi(os.Args[1])
 	if e != nil {
@@ -32,15 +54,14 @@ func main() {
 	var name string
 	if u == "test" {
 		D = test
-		name = fmt.Sprintf("compiled/test_%d.data", n)
+		name = fmt.Sprintf("compiled/test_%d_%d.data", max, n)
 	} else {
 		D = train
-		name = fmt.Sprintf("compiled/train_%d.data", n)
+		name = fmt.Sprintf("compiled/train_%d_%d.data", max, n)
 	}
 
 	w, h := mnist.Width, mnist.Height
 	t := w * h
-	max := 256
 
 	f, e := os.Create(name)
 	defer f.Close()
@@ -76,14 +97,23 @@ func main() {
 			continue
 		}
 		L[label]++
-		//s, _ := os.Create(fmt.Sprintf("/tmp/%s_%d_%d.pgm", u, i, label))
-		//fmt.Fprintf(s, "P2\n%d %d\n%d\n", w, h, max-1)
+		var s *os.File
+		if debug {
+			s, _ = os.Create(fmt.Sprintf("/tmp/%s_%d_%d.pgm", u, i, label))
+			fmt.Fprintf(s, "P2\n%d %d\n%d\n", w, h, max-1)
+		}
 		for j := range image {
-			fmt.Fprintf(f, "%d ", image[j])
-			//fmt.Fprintf(s, "%d ", image[j])
+			p := int(image[j])
+			p = ((max - 1) * p) / 255
+			fmt.Fprintf(f, "%d ", p)
+			if debug {
+				fmt.Fprintf(s, "%d ", p)
+			}
 		}
 		fmt.Fprintf(f, "%d\n", label)
-		//s.Close()
+		if debug {
+			s.Close()
+		}
 	}
 
 	fmt.Println("Done.")
