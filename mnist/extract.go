@@ -38,7 +38,7 @@ func main() {
 
 	w, h := mnist.Width, mnist.Height
 	t := w * h
-	max := 255
+	max := 256
 
 	f, e := os.Create(name)
 	defer f.Close()
