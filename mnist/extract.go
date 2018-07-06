@@ -9,8 +9,10 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: %s n [test|train]\n  n     - number of digits to convert\n  test  - use test"+
-			"set\n  train - use training set\n", os.Args[0])
+		fmt.Printf("Usage: %s n [test|train]\n"+
+			"n     - number of digits to convert\n"+
+			"test  - use test set\n"+
+			"train - use training set\n", os.Args[0])
 		os.Exit(1)
 	}
 	n, e := strconv.Atoi(os.Args[1])
@@ -57,13 +59,12 @@ func main() {
 	k := 0
 
 	n = len(D.Images)
-	for i := 0; ; {
+	for i := 0; ; i++ {
 		if i >= n {
 			i = i % n
 		}
 		image, label := D.Images[i], D.Labels[i]
 		if L[label] >= m {
-			i += n / 100
 			last := k
 			k |= (1 << label)
 			if k != last {
@@ -75,10 +76,14 @@ func main() {
 			continue
 		}
 		L[label]++
-		for i := range image {
-			fmt.Fprintf(f, "%d ", image[i])
+		//s, _ := os.Create(fmt.Sprintf("/tmp/%s_%d_%d.pgm", u, i, label))
+		//fmt.Fprintf(s, "P2\n%d %d\n%d\n", w, h, max-1)
+		for j := range image {
+			fmt.Fprintf(f, "%d ", image[j])
+			//fmt.Fprintf(s, "%d ", image[j])
 		}
 		fmt.Fprintf(f, "%d\n", label)
+		//s.Close()
 	}
 
 	fmt.Println("Done.")
