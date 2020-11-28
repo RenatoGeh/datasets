@@ -11,6 +11,7 @@
 - Olivetti Padded Uniform (Olivetti dataset with padded left and right borders so that width and height are divisible by four; paddings pixel values are uniformly distributed)
 - Olivetti Small (Olivetti dataset smaller size)
 - MNIST
+- Self driving dataset (https://github.com/felipessalvatore/self_driving_data)
 
 Most datasets have their original images split into its categories by a
 folder with its name indicating its class.

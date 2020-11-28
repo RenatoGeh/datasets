@@ -18,7 +18,7 @@ path = sys.argv[3]
 
 max = 255
 if len(sys.argv) == 5:
-    max = int(sys.argv[4])-1
+    max = int(sys.argv[4])
 k = 255/max
 
 DIRS = ["up", "left", "right"]

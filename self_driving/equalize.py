@@ -39,7 +39,7 @@ for i, I in enumerate(D):
     draw_hist(cImg)
     plt.imshow(res, cmap='gray')
     plt.show()
-  T.append(np.append(eImg, l))
+  T.append(np.append(eImg/k, l))
 
 T = np.asarray(T).astype('uint8')
 np.save(fout, T)
